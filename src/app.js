@@ -1,8 +1,12 @@
 const express = require("express");
+require("dotenv").config();
+const { connectDB } = require("./config/database");
 
 const app = express();
 
 const PORT = 7777;
+
+app.use(express.json());
 
 app.use("/hello", (req, res) => {
   res.send("Hello hello hello ..!!");
@@ -13,17 +17,15 @@ app.use("/test", (req, res) => {
   res.send("Hello, from test route");
 });
 
-app.use("/", (req, res) => {
-  res.send("Hello, from Express.js backend!");
+app.post("/user", (req, res) => {
+  const body = req.body;
+  console.log(body);
+  console.log(process.env.MONGODB_URI);
+  res.send({ messsage: "User created successfully!" });
 });
 
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    next();
-    // res.send(err.message); 
-    // console.error(err);
-    // res.status(500).send("Something went wrong");
-  }
+app.use("/", (req, res) => {
+  res.send("Hello, from Express.js backend!");
 });
 
 app.use("/", (err, req, res, next) => {
@@ -36,6 +38,9 @@ app.use("/", (err, req, res, next) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server started listening incoming requets on port ${PORT}...`);
+connectDB().then(() => {
+  console.log("Database connected successfully");
+  app.listen(PORT, () => {
+    console.log(`Server started listening incoming requets on port ${PORT}...`);
+  });
 });
